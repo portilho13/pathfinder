@@ -13,6 +13,7 @@ interface Cell {
   isStart: boolean;
   isFinish: boolean;
   isVisited: boolean;
+  isMarked: boolean;
 }
 
 const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
@@ -25,7 +26,7 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
     for (let x = 0; x < 50; x++) {
       const row: Cell[] = [];
       for (let y = 0; y < 20; y++) {
-        row.push({ x, y, isVisited: false, isStart: false, isFinish: false });
+        row.push({ x, y, isVisited: false, isStart: false, isFinish: false, isMarked: false});
       }
       newGrid.push(row);
     }
@@ -149,7 +150,20 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
     //   destination_y: finish.y
     // });
     // console.log(`Generating path from ${start.x}, ${start.y} to ${finish.x}, ${finish.y}`);
-    await invoke('choose_algorithm', {algorithm: algorithm});
+    const algoGrid: number[][] = [];
+
+    grid.forEach(row => {
+      const newRow: number[] = [];
+      row.forEach(cell => {
+        if (cell.isMarked) {
+          newRow.push(0);
+        } else {
+          newRow.push(1);
+        }
+      });
+      algoGrid.push(newRow);
+    });
+    await invoke('choose_algorithm', {algorithm: algorithm, grid: algoGrid});
   };
   
 
