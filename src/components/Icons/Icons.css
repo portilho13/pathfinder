@@ -1,0 +1,47 @@
+.icons-container {
+    display: flex;
+    margin: auto;
+    width: 80%;
+    height: 10vh;
+    justify-content: space-between;
+    font-family: 'Baloo Bhai', sans-serif;
+    align-items: flex-start; /* Align items at the start of the container */
+  }
+  
+  .icon {
+    display: flex;
+    align-items: center; /* Align icon and label vertically */
+    color: white;
+  }
+  
+  /* Apply pointer cursor when hovering over the SVG icon */
+  .icon svg:hover {
+    cursor: pointer;
+  }
+  
+  /* Apply pointer cursor when hovering over the label */
+  .icon-label:hover {
+    cursor: pointer;
+  }
+  
+  /* Adjust size of the SVG icon */
+  .icon svg {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px; /* Add some margin between the icon and label */
+  }
+  
+  /* Style for the label */
+  .icon-label {
+    font-size: 20px; /* Adjust font size as needed */
+    /* Add other styles as needed */
+  }
+  
+  .dropdown {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  

@@ -1,0 +1,25 @@
+/* Grid.css */
+
+.grid {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: repeat(50, 20px); /* 20 columns each 20px wide */
+    grid-template-rows: repeat(20, 20px); /* 50 rows each 20px high */
+    gap: 2px; /* Optional: Add a gap between cells */
+  }
+  
+  .cell {
+    display: flex;
+    color: black;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 1px solid black; /* Optional: Add border for visibility */
+  }
+  
+  .grid-container {
+    display: flex;
+    flex-direction: column;
+  }

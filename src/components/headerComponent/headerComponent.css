@@ -1,0 +1,8 @@
+.header-component {
+    display: flex;
+    font-size: 40px;
+    width: 100%;
+    justify-content: center;
+    color: white;
+    font-family: 'Baloo Bhai', sans-serif;
+}
