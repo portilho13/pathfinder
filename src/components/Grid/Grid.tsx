@@ -14,7 +14,10 @@ interface Cell {
   isFinish: boolean;
   isVisited: boolean;
   isMarked: boolean;
+  isPath: boolean;
 }
+
+type Pair = [number, number];
 
 const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
   // Initialize state to manage the grid of cells
@@ -26,7 +29,7 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
     for (let x = 0; x < 50; x++) {
       const row: Cell[] = [];
       for (let y = 0; y < 20; y++) {
-        row.push({ x, y, isVisited: false, isStart: false, isFinish: false, isMarked: false});
+        row.push({ x, y, isVisited: false, isStart: false, isFinish: false, isMarked: false, isPath: false});
       }
       newGrid.push(row);
     }
@@ -101,26 +104,50 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
         {row.map((cell, cellIndex) => (
           <div
             key={`${cell.x}-${cell.y}`}
-            className={'cell'}
+            className={`cell ${cell.isPath ? 'path-cell' : cell.isVisited ? 'visited-cell' : ''}`}
             onClick={() => handleCellClick(cell.x, cell.y)}
           >
-            {cell.isStart && (
+            {cell.isStart ? (
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cursor-fill" viewBox="0 0 16 16">
                 <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
               </svg>
-            )}
-            {cell.isFinish && (
+            ) : cell.isFinish ? (
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-geo-alt-fill" viewBox="0 0 16 16">
                 <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
               </svg>
-            )}
+            ) : ('')}
           </div>
         ))}
       </div>
     ));
   };
 
+  const resetPath = () => {
+    setGrid(prevGrid =>
+      prevGrid.map(row =>
+        row.map(cell => ({
+          ...cell,
+          isPath: false
+        }))
+      )
+    );
+  };
+
+  const resetVisitedPath = () => {
+    setGrid(prevGrid =>
+      prevGrid.map(row =>
+        row.map(cell => ({
+          ...cell,
+          isVisited: false
+        }))
+      )
+    );
+  };
+  
+
   async function generatePath() {
+    resetPath();
+    resetVisitedPath();
     let start: Cell | undefined;
     let finish: Cell | undefined;
   
@@ -163,7 +190,47 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
       });
       algoGrid.push(newRow);
     });
-    await invoke('choose_algorithm', {algorithm: algorithm, grid: algoGrid});
+    const [path, visited] =  await invoke<[Pair[], Pair[]]>('choose_algorithm', {algorithm: algorithm, grid: algoGrid, startX: start.x, startY: start.y, endX: finish.x, endY: finish.y});
+    const updateVisitedGrid = async () => {
+      resetVisitedPath();
+      for (let i = 0; i < visited.length; i++) {
+        const [x, y] = visited[i];
+        await new Promise(resolve => setTimeout(resolve, 1)); // Adjust the timeout duration as needed
+        setGrid(prevGrid => {
+          const updatedGrid = prevGrid.map(row =>
+            row.map(cell => {
+              if (cell.x === x && cell.y === y) {
+                return { ...cell, isVisited: true };
+              }
+              return cell;
+            })
+          );
+          return updatedGrid;
+        });
+      }
+    };
+    //const path: Pair[] = [[1, 3], [2, 3], [5, 5]];
+    const updateGridWithDelay = async () => {
+      resetPath();
+      for (let i = 0; i < path.length; i++) {
+        const [x, y] = path[i];
+        await new Promise(resolve => setTimeout(resolve, 1)); // Adjust the timeout duration as needed
+        setGrid(prevGrid => {
+          const updatedGrid = prevGrid.map(row =>
+            row.map(cell => {
+              if (cell.x === x && cell.y === y) {
+                return { ...cell, isPath: true };
+              }
+              return cell;
+            })
+          );
+          return updatedGrid;
+        });
+      }
+    };
+  
+    // Call the function to update the grid with a delay
+    updateVisitedGrid().then(() => updateGridWithDelay());
   };
   
 

@@ -1,40 +1,50 @@
-
-
-// Prevents additional console window on Windows in release, DO NOT REMOVE!!
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+use serde::de;
+use std::collections::HashMap;
 
 mod dijkstra;
 mod a_star;
 
-use dijkstra::dijkstra;
-use a_star::a_star;
+use crate::dijkstra::dijkstra;
+use crate::a_star::astar;
 
-mod structs {
+mod types {
     pub type Pair = (i32, i32);
 }
 
+use crate::types::Pair;
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn choose_algorithm(algorithm: String, grid: Vec<Vec<i32>>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) {
-    let start: structs::Pair = (start_x, start_y);
-    let end: structs::Pair = (end_x, end_y);
+fn choose_algorithm(algorithm: String, grid: Vec<Vec<i32>>, start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> (Vec<Pair>, Vec<Pair>) {
+    let start: Pair = (start_x, start_y);
+    let destination: Pair = (end_x, end_y);
+
     match algorithm.as_str() {
         "dijkstra" => {
-            // Call the dijkstra function
-            dijkstra();
+            if let Some((path, visited)) = dijkstra(grid, start, destination) {
+                return (path, visited);
+            } else {
+                return (vec![], vec![]); // Returning empty vectors if no path found
+            }
         }
         "aStar" => {
-            // Call the a_star function
-            a_star(grid, start, end);
+            if let Some((path, visited)) = astar(grid, start, destination) {
+                return (path, visited); // Returning empty vector for visited nodes for A* algorithm
+            } else {
+                return (vec![], vec![]); // Returning empty vectors if no path found
+            }
         }
         _ => {
             println!("Unknown algorithm: {}", algorithm);
+            return (vec![], vec![]); // Returning empty vectors for unknown algorithm
         }
     }
 }
 
 #[tauri::command]
-fn greet() {}
+fn greet() {
+    println!("greet");
+}
 
 fn main() {
     tauri::Builder::default()

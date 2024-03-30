@@ -23,3 +23,11 @@
     display: flex;
     flex-direction: column;
   }
+
+  .path-cell {
+    background-color: green;
+  }
+
+  .visited-cell {
+    background-color: blue;
+  }

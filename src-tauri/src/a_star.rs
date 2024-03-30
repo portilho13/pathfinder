@@ -1,47 +1,74 @@
-use crate::structs::Pair;
+use std::collections::{BinaryHeap, HashSet, HashMap};
+use std::cmp::Ordering;
+use crate::types::Pair;
 
-struct Cell {
-    parent_i: i32,
-    parent_j: i32,
-
-    f: f32,
-    g: f32,
-    h: f32,
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+struct Node {
+    position: Pair,
+    cost: usize,
 }
 
-pub type pPair =(f32, Pair);
-
-fn is_valid(row: i32, col: i32, rows: i32, cols: i32) -> bool {
-    row >= 0 && row < rows && col >= 0 && col < cols
+impl Ord for Node {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.cost.cmp(&self.cost)
+    }
 }
 
-fn is_unblocked(grid: Vec<Vec<i32>>, row: i32, col: i32) -> bool {
-    grid[row as usize][col as usize] == 1
+impl PartialOrd for Node {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
-fn is_destination(row: i32, col: i32, dest: Pair) -> bool {
-    row == dest.0 && col == dest.1
+fn heuristic(current: Pair, goal: Pair) -> usize {
+    let dx = (goal.0 as isize - current.0 as isize).abs() as usize;
+    let dy = (goal.1 as isize - current.1 as isize).abs() as usize;
+    dx + dy
 }
 
-fn calculate_h_value(row: i32, col: i32, dest: Pair) -> f32 {
-    // Calculate the squared differences for each dimension
-    let row_diff_squared = (row - dest.0).pow(2);
-    let col_diff_squared = (col - dest.1).pow(2);
-    
-    // Calculate the sum of squared differences and convert to f32
-    let sum_squared_diff = (row_diff_squared + col_diff_squared) as f32;
-    
-    // Return the square root of the sum as f32
-    sum_squared_diff.sqrt()
+pub fn astar(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair>, Vec<Pair>)> {
+    let mut open_set = BinaryHeap::new();
+    let mut closed_set = HashSet::new();
+    let mut came_from = HashMap::new();
+    let mut g_score = HashMap::new();
+    let mut f_score = HashMap::new();
+    let mut visited_cells = Vec::new();
+
+    g_score.insert(start, 0);
+    f_score.insert(start, heuristic(start, end));
+
+    open_set.push(Node { position: start, cost: heuristic(start, end) });
+
+    while let Some(Node { position, cost }) = open_set.pop() {
+        if position == end {
+            // Reconstruct path
+            let mut current = position;
+            let mut path = vec![current];
+            while let Some(&prev) = came_from.get(&current) {
+                path.push(prev);
+                current = prev;
+            }
+            path.reverse();
+            return Some((path, visited_cells));
+        }
+
+        closed_set.insert(position);
+
+        for (dx, dy) in &[(1, 0), (-1, 0), (0, 1), (0, -1)] {
+            let neighbor = ((position.0 as isize + dx) as i32, (position.1 as isize + dy) as i32);
+            if neighbor.0 >= 0 && neighbor.0 < grid.len() as i32 && neighbor.1 >= 0 && neighbor.1 < grid[0].len() as i32 && grid[neighbor.0 as usize][neighbor.1 as usize] != 0 && !closed_set.contains(&neighbor) {
+                let tentative_g_score = g_score.get(&position).unwrap_or(&usize::MAX) + 1;
+                if tentative_g_score < *g_score.entry(neighbor).or_insert(usize::MAX) {
+                    came_from.insert(neighbor, position);
+                    g_score.insert(neighbor, tentative_g_score);
+                    f_score.insert(neighbor, tentative_g_score + heuristic(neighbor, end));
+                    open_set.push(Node { position: neighbor, cost: tentative_g_score + heuristic(neighbor, end) });
+                    visited_cells.push(neighbor); // Record visited cells
+                }
+            }
+        }
+    }
+
+    None
 }
 
-
-
-
-
-pub fn a_star(grid: Vec<Vec<i32>>, start: Pair, dest: Pair) {
-    let rows: i32 = grid.len() as i32;
-    let cols: i32 = grid[0].len() as i32;
-
-    println!("Hello, World!");
-}
