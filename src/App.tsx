@@ -21,7 +21,6 @@ const App: React.FC = () => {
     setSelectedIcon(icon);
   };
 
-
   return (
     <div className="container">
       <HeaderComponent />

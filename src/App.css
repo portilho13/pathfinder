@@ -7,6 +7,7 @@
   margin-top: 5vh;
   display: flex;
   justify-content: center;
+  gap: 10px;
 }
 
 .button {
@@ -25,5 +26,43 @@
   /* Hover effect */
   &:hover {
     background-color: darkgreen; /* Darken background color on hover */
+  }
+}
+
+.button-clear {
+  color: white;
+  background-color: red;
+  padding: 10px 20px; /* Adjust padding for better appearance */
+  width: 150px; /* Adjust width to fit the content */
+  height: 50px; /* Adjust height for better visibility */
+  border: none; /* Remove border */
+  border-radius: 20px; /* Increase border-radius for rounded corners */
+  font-size: 16px; /* Adjust font size for better readability */
+  cursor: pointer; /* Add pointer cursor to indicate interactivity */
+  transition: background-color 0.3s ease; /* Add smooth transition for hover effect */
+  font-family: 'Baloo Bhai', sans-serif;
+
+  /* Hover effect */
+  &:hover {
+    background-color: orangered; /* Darken background color on hover */
+  }
+}
+
+.button-generate {
+  color: black;
+  background-color: white;
+  padding: 10px 20px; /* Adjust padding for better appearance */
+  width: 150px; /* Adjust width to fit the content */
+  height: 50px; /* Adjust height for better visibility */
+  border: none; /* Remove border */
+  border-radius: 20px; /* Increase border-radius for rounded corners */
+  font-size: 16px; /* Adjust font size for better readability */
+  cursor: pointer; /* Add pointer cursor to indicate interactivity */
+  transition: background-color 0.3s ease; /* Add smooth transition for hover effect */
+  font-family: 'Baloo Bhai', sans-serif;
+
+  /* Hover effect */
+  &:hover {
+    background-color: grey; /* Darken background color on hover */
   }
 }

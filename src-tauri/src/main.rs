@@ -3,6 +3,9 @@ use std::collections::HashMap;
 
 mod dijkstra;
 mod a_star;
+mod recursive_division;
+
+use crate::recursive_division::recursive_division_maze;
 
 use crate::dijkstra::dijkstra;
 use crate::a_star::astar;
@@ -42,13 +45,16 @@ fn choose_algorithm(algorithm: String, grid: Vec<Vec<i32>>, start_x: i32, start_
 }
 
 #[tauri::command]
-fn greet() {
-    println!("greet");
+fn generate_grid() -> Vec<Vec<usize>> {
+    let width = 50;
+    let height = 20;
+    let maze = recursive_division_maze(width, height);
+    return maze;
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![choose_algorithm, greet])
+        .invoke_handler(tauri::generate_handler![choose_algorithm, generate_grid])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

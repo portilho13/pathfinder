@@ -1,7 +1,6 @@
 use std::collections::{BinaryHeap, HashMap};
 use std::cmp::Ordering;
 use crate::types::Pair;
-use std::usize;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 struct Node {
@@ -27,6 +26,7 @@ pub fn dijkstra(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair
     let mut distances = vec![vec![usize::MAX; cols]; rows];
     let mut visited = vec![vec![false; cols]; rows];
     let mut prev: HashMap<Pair, Pair> = HashMap::new();
+    let mut visited_cells = Vec::new(); // Store visited cells in order
 
     let mut pq = BinaryHeap::new();
     pq.push(Node { vertex: start, distance: 0 });
@@ -37,12 +37,11 @@ pub fn dijkstra(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair
             continue;
         }
         visited[i as usize][j as usize] = true;
+        visited_cells.push(vertex); // Add visited cell to the list
 
         if vertex == end {
-            println!("Shortest distance from start to end: {}", distance);
-
             // Reconstruct the path
-            let mut path = vec![];
+            let mut path = Vec::new();
             let mut current = end;
             while current != start {
                 path.push(current);
@@ -50,13 +49,14 @@ pub fn dijkstra(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair
             }
             path.push(start);
             path.reverse();
-            return Some((path, visited.iter().enumerate().flat_map(|(i, row)| row.iter().enumerate().filter(|&(_, &v)| v).map(move |(j, _)| (i as i32, j as i32))).collect()));
+
+            return Some((path, visited_cells));
         }
 
         for (di, dj) in &[(1, 0), (-1, 0), (0, 1), (0, -1)] {
             let ni = i + di;
             let nj = j + dj;
-            if ni >= 0 && ni < rows as i32 && nj >= 0 && nj < cols as i32 {
+            if ni >= 0 && ni < rows as i32 && nj >= 0 && nj < cols as i32 && grid[ni as usize][nj as usize] == 1 {
                 let cost = distance + grid[ni as usize][nj as usize] as usize;
                 if cost < distances[ni as usize][nj as usize] {
                     distances[ni as usize][nj as usize] = cost;
@@ -67,6 +67,5 @@ pub fn dijkstra(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair
         }
     }
 
-    println!("No path found from start to end.");
     None
 }

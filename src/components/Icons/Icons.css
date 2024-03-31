@@ -44,4 +44,14 @@
     border-radius: 4px;
     margin-bottom: 20px;
   }
+
+  .button-icon {
+    width: 12vw;
+    height: 4vh;
+    border-radius: 8px;
+    font-size: 15px;
+    color: black;
+    background-color: white;
+    font-family: 'Baloo Bhai', sans-serif;
+  }
   

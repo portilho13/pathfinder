@@ -33,6 +33,7 @@ pub fn astar(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair>, 
     let mut g_score = HashMap::new();
     let mut f_score = HashMap::new();
     let mut visited_cells = Vec::new();
+    let mut path = Vec::new();
 
     g_score.insert(start, 0);
     f_score.insert(start, heuristic(start, end));
@@ -43,12 +44,12 @@ pub fn astar(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair>, 
         if position == end {
             // Reconstruct path
             let mut current = position;
-            let mut path = vec![current];
             while let Some(&prev) = came_from.get(&current) {
-                path.push(prev);
+                path.push(current);
                 current = prev;
             }
-            path.reverse();
+            path.push(start);
+            path.reverse(); // Sort the path
             return Some((path, visited_cells));
         }
 
@@ -56,14 +57,14 @@ pub fn astar(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair>, 
 
         for (dx, dy) in &[(1, 0), (-1, 0), (0, 1), (0, -1)] {
             let neighbor = ((position.0 as isize + dx) as i32, (position.1 as isize + dy) as i32);
-            if neighbor.0 >= 0 && neighbor.0 < grid.len() as i32 && neighbor.1 >= 0 && neighbor.1 < grid[0].len() as i32 && grid[neighbor.0 as usize][neighbor.1 as usize] != 0 && !closed_set.contains(&neighbor) {
+            if neighbor.0 >= 0 && neighbor.0 < grid.len() as i32 && neighbor.1 >= 0 && neighbor.1 < grid[0].len() as i32 && grid[neighbor.0 as usize][neighbor.1 as usize] == 1 && !closed_set.contains(&neighbor) {
                 let tentative_g_score = g_score.get(&position).unwrap_or(&usize::MAX) + 1;
                 if tentative_g_score < *g_score.entry(neighbor).or_insert(usize::MAX) {
                     came_from.insert(neighbor, position);
                     g_score.insert(neighbor, tentative_g_score);
                     f_score.insert(neighbor, tentative_g_score + heuristic(neighbor, end));
                     open_set.push(Node { position: neighbor, cost: tentative_g_score + heuristic(neighbor, end) });
-                    visited_cells.push(neighbor); // Record visited cells
+                    visited_cells.push(neighbor);
                 }
             }
         }
@@ -71,4 +72,3 @@ pub fn astar(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair>, 
 
     None
 }
-

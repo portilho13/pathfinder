@@ -52,6 +52,9 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
               resetFinish(x, y);
               return { ...cell, isFinish: !cell.isFinish, isStart: false };
             }
+            else if (icon === 'wall') {
+              return {...cell, isMarked: !cell.isMarked}
+            }
           }
           return cell;
         })
@@ -104,7 +107,7 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
         {row.map((cell, cellIndex) => (
           <div
             key={`${cell.x}-${cell.y}`}
-            className={`cell ${cell.isPath ? 'path-cell' : cell.isVisited ? 'visited-cell' : ''}`}
+            className={`cell ${cell.isPath ? 'path-cell' : cell.isVisited ? 'visited-cell' : cell.isMarked ? 'marked-cell' : ''}`}
             onClick={() => handleCellClick(cell.x, cell.y)}
           >
             {cell.isStart ? (
@@ -195,26 +198,25 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
       resetVisitedPath();
       for (let i = 0; i < visited.length; i++) {
         const [x, y] = visited[i];
-        await new Promise(resolve => setTimeout(resolve, 1)); // Adjust the timeout duration as needed
         setGrid(prevGrid => {
           const updatedGrid = prevGrid.map(row =>
             row.map(cell => {
               if (cell.x === x && cell.y === y) {
-                return { ...cell, isVisited: true };
+                return {...cell, isVisited: true};
               }
               return cell;
             })
           );
-          return updatedGrid;
+          return updatedGrid; // Return the updated grid
         });
+        await new Promise(resolve => setTimeout(resolve, 10)); // Set a timeout for each cell
       }
     };
-    //const path: Pair[] = [[1, 3], [2, 3], [5, 5]];
+  
     const updateGridWithDelay = async () => {
       resetPath();
       for (let i = 0; i < path.length; i++) {
         const [x, y] = path[i];
-        await new Promise(resolve => setTimeout(resolve, 1)); // Adjust the timeout duration as needed
         setGrid(prevGrid => {
           const updatedGrid = prevGrid.map(row =>
             row.map(cell => {
@@ -226,12 +228,60 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
           );
           return updatedGrid;
         });
+        await new Promise(resolve => setTimeout(resolve, 1)); // Adjust the timeout duration as needed
       }
     };
   
     // Call the function to update the grid with a delay
-    updateVisitedGrid().then(() => updateGridWithDelay());
+    await updateVisitedGrid();
+    await updateGridWithDelay();
   };
+
+  const clearGrid = () => {
+    setGrid(prevGrid => {
+      const updatedGrid = prevGrid.map(row =>
+        row.map(cell => ({
+          ...cell,
+          isVisited: false,
+          isStart: false,
+          isFinish: false,
+          isMarked: false,
+          isPath: false
+        }))
+      );
+      return updatedGrid;
+    });
+  };
+
+  const generateGrid = async () => {
+    console.log('Generating Grid');
+    const genGrid: number[][] = await invoke('generate_grid');
+    console.log(genGrid);
+    const rows = genGrid.length;
+    const columns = genGrid[0].length;
+    console.log(rows, columns);
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < columns; j++) {
+        setGrid(prevGrid => {
+          const updatedGrid = prevGrid.map(row =>
+            row.map(cell => {
+              if (cell.x === j && cell.y === i) { // Corrected indexing
+                if (genGrid[i][j] === 0) {
+                  return {...cell, isMarked: true};
+                } else if (genGrid[i][j] === 1) {
+                  return {...cell, isMarked: false};
+                }
+              }
+              return cell;
+            })
+          );
+          return updatedGrid; // Return the updated grid
+        });
+      }
+    }
+};
+
+  
   
 
   return (
@@ -241,6 +291,8 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
             <button className="button" onClick={generatePath}>
               Generate
             </button>
+            <button className='button-clear' onClick={clearGrid}>Clear</button>
+            <button className="button-generate" onClick={generateGrid}>Generate Grid</button>
           </div>
       </>
     );

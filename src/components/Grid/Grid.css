@@ -31,3 +31,7 @@
   .visited-cell {
     background-color: blue;
   }
+
+  .marked-cell {
+    background-color: black;
+  }
