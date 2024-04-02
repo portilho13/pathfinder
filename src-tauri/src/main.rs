@@ -48,8 +48,9 @@ fn choose_algorithm(algorithm: String, grid: Vec<Vec<i32>>, start_x: i32, start_
 fn generate_grid() -> Vec<Vec<usize>> {
     let width = 50;
     let height = 20;
-    let maze = recursive_division_maze(width, height);
-    return maze;
+    let mut maze: Vec<Vec<usize>> = vec![vec![1; width as usize]; height as usize];
+    maze = recursive_division_maze(maze, height, width, 0, height - 1, 0, width - 1, false);
+    maze
 }
 
 fn main() {
