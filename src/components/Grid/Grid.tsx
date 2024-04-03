@@ -64,6 +64,7 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
   };
 
 
+
   const resetStart = (x: number, y: number) => {
     setGrid(prevGrid => {
       const updatedGrid = prevGrid.map(row =>
@@ -104,7 +105,7 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
   const renderGrid = () => {
     return grid.map((row, rowIndex) => (
       <div key={rowIndex} className="row">
-        {row.map((cell, cellIndex) => (
+        {row.map((cell) => (
           <div
             key={`${cell.x}-${cell.y}`}
             className={`cell ${cell.isPath ? 'path-cell' : cell.isVisited ? 'visited-cell' : cell.isMarked ? 'marked-cell' : ''}`}
@@ -277,6 +278,7 @@ const Grid: React.FC<GridProps> = ({ onCellClick, icon, algorithm}) => {
           );
           return updatedGrid; // Return the updated grid
         });
+        await new Promise(resolve => setTimeout(resolve, 0.5));
       }
     }
 };

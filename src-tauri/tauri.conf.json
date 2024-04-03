@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "pathfinder",
-    "version": "0.0.0"
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -20,8 +20,8 @@
     "windows": [
       {
         "title": "pathfinder",
-        "width": 800,
-        "height": 600
+        "width": 1920,
+        "height": 1080
       }
     ],
     "security": {
@@ -30,7 +30,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "pt.finder.path",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

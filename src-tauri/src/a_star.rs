@@ -40,7 +40,7 @@ pub fn astar(grid: Vec<Vec<i32>>, start: Pair, end: Pair) -> Option<(Vec<Pair>, 
 
     open_set.push(Node { position: start, cost: heuristic(start, end) });
 
-    while let Some(Node { position, cost }) = open_set.pop() {
+    while let Some(Node { position, cost: _ }) = open_set.pop() {
         if position == end {
             // Reconstruct path
             let mut current = position;
